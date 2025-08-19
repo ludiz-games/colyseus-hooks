@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
-    "lib": ["DOM", "DOM.Iterable", "ES6"],
+    "target": "ES2019",
+    "lib": ["DOM", "DOM.Iterable", "ES2019"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
