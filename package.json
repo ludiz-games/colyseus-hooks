@@ -1,33 +1,55 @@
 {
-  "name": "convex-starter",
-  "private": true,
+  "name": "@ludiz/colyseus-hooks",
+  "version": "0.1.0",
+  "description": "React hooks for Colyseus real-time multiplayer framework",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "check-types": "tsc --noEmit",
+    "prepublishOnly": "pnpm run build",
+    "prepare": "pnpm run build"
+  },
+  "keywords": [
+    "react",
+    "hooks",
+    "colyseus",
+    "multiplayer",
+    "real-time",
+    "game-development"
+  ],
+  "author": "Ludiz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ludiz-games/colyseus-hooks"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "colyseus.js": ">=0.15.0",
+    "@colyseus/schema": ">=2.0.0"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@turbo/gen": "^2.5.4",
-    "@types/lodash.get": "^4.4.9",
-    "@types/lodash.set": "^4.3.9",
-    "@types/mustache": "^4.2.6",
-    "prettier": "^3.6.2",
-    "prettier-plugin-organize-imports": "^4.1.0",
-    "prettier-plugin-tailwindcss": "^0.6.14",
-    "turbo": "^2.5.5",
-    "typescript": "5.8.3"
+    "@types/react": "^18.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
   },
-  "packageManager": "pnpm@9.0.0",
-  "engines": {
-    "node": ">=18"
-  },
-  "dependencies": {
-    "lodash.get": "^4.4.2",
-    "lodash.set": "^4.3.2",
-    "mustache": "^4.2.0"
+  "publishConfig": {
+    "access": "public"
   }
 }

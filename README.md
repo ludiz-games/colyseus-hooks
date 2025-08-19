@@ -1,164 +1,102 @@
-# convex-starter
+# @ludiz/colyseus-hooks
 
-A highly opinionated Next.js starter with better-auth, convex, shadcn/ui, react-email, and turborepo. Pre-configured for rapid, scalable development.
+React hooks for [Colyseus](https://colyseus.io) real-time multiplayer framework.
 
-## Project Structure
+## Installation
 
+```bash
+npm install @ludiz/colyseus-hooks colyseus.js @colyseus/schema
 ```
-convex-starter/
-├── apps/
-│   └── web/                # Main Next.js application
-├── packages/
-│   ├── backend/            # Convex backend
-│   ├── eslint-config/      # Shared ESLint configurations
-│   ├── typescript-config/  # Shared TypeScript configurations
-│   └── ui/                 # Shared UI components (shadcn/ui)
-└── turbo/                  # Turborepo configuration
+
+## Usage
+
+```tsx
+import { colyseus } from "@ludiz/colyseus-hooks";
+import { Schema } from "@colyseus/schema";
+
+// Define your state schema
+class GameState extends Schema {
+  // your schema properties
+}
+
+function GameComponent() {
+  const { connectToColyseus, useColyseusRoom, useColyseusState } =
+    colyseus<GameState>("ws://localhost:2567", GameState);
+
+  const room = useColyseusRoom();
+  const state = useColyseusState();
+
+  // Connect to room
+  useEffect(() => {
+    connectToColyseus("my-room", { playerName: "Alice" });
+  }, [connectToColyseus]);
+
+  // Handle messages
+  useEffect(() => {
+    if (!room) return;
+
+    room.onMessage("game-event", (payload) => {
+      console.log("Received:", payload);
+    });
+  }, [room]);
+
+  // Send messages
+  const sendAction = () => {
+    room?.send("player-action", { type: "move", direction: "up" });
+  };
+
+  return (
+    <div>
+      <div>Room: {room?.roomId}</div>
+      <div>State: {state?.phase}</div>
+      <button onClick={sendAction}>Send Action</button>
+    </div>
+  );
+}
+```
+
+## API
+
+### `colyseus<T>(endpoint, schema?)`
+
+Creates a Colyseus instance with React hooks.
+
+**Parameters:**
+
+- `endpoint` - WebSocket endpoint (e.g., `'ws://localhost:2567'`)
+- `schema` - Optional Colyseus schema class
+
+**Returns:**
+
+- `connectToColyseus(roomName, options)` - Connect to a room
+- `disconnectFromColyseus()` - Disconnect from current room
+- `useColyseusRoom()` - Hook to get current room instance
+- `useColyseusState()` - Hook to get current room state
+
+### `useColyseusRoom()`
+
+Returns the current Colyseus room instance or `undefined` if not connected.
+
+### `useColyseusState(selector?)`
+
+Returns the current room state. Optionally accepts a selector function for derived state.
+
+```tsx
+// Get full state
+const state = useColyseusState();
+
+// Get derived state
+const playerCount = useColyseusState((state) => state.players.size);
 ```
 
 ## Features
 
-- Authentication with [Better Auth](https://better-auth.com)
-- Backend platform (db, functions, storage, jobs) using [Convex](https://www.convex.dev/)
-- UI components built with [shadcn/ui](https://ui.shadcn.com) and [Tailwind CSS](https://tailwindcss.com)
-- Email support with [react-email](https://react.email) and [Resend](https://resend.com)
-- Form handling via [react-hook-form](https://react-hook-form.com)
-- Monorepo setup using [Turborepo](https://turbo.build/repo)
+- ✅ **Type-safe** - Full TypeScript support
+- ✅ **Reactive** - Automatic re-renders on state changes
+- ✅ **Efficient** - Uses `useSyncExternalStore` for optimal performance
+- ✅ **Simple** - Clean, intuitive API
+- ✅ **Reliable** - Handles connection lifecycle automatically
 
-## Getting Started
+## License
 
-### 1. Create a New Project
-
-```bash
-npx create-next-app@latest [project-name] --use-pnpm --example https://github.com/jordanliu/convex-starter
-```
-
-### 2. Install Dependencies
-
-```bash
-cd [project-name]
-pnpm install
-```
-
-### 3. Configure Client
-
-Copy the example environment file into .env.local in apps/web, then update it with your real values.
-
-```bash
-cp apps/web/.env.example apps/web/.env.local
-```
-
-### 4. Configure Convex
-
-```bash
-pnpm --filter @repo/backend run setup
-```
-
-This initializes your Convex project. Next, ensure your backend environment variables are uploaded to the Convex dashboard. From root run:
-
-```bash
-cp packages/backend/.env.example packages/backend/.env.local
-```
-
-You will then need to upload the environment variables into your Convex dashboard manually or via `convex env`. You can find more details [here](https://docs.convex.dev/production/environment-variables).
-
-### 5. Start the Development Server
-
-```bash
-pnpm dev
-```
-
-This will start both the Next.js application at [http://localhost:3000](http://localhost:3000) and the Convex development server at [http://127.0.0.1:6790](http://127.0.0.1:6790).
-
-## Available Commands
-
-### Development
-
-```bash
-pnpm dev          # Start development servers for all packages
-pnpm build        # Build all packages for production
-pnpm start        # Start production server (requires build)
-```
-
-### Code Quality
-
-```bash
-pnpm lint         # Run ESLint across all packages
-pnpm format       # Format code with Prettier
-pnpm check-types  # Run TypeScript type checking
-```
-
-### Convex-Specific
-
-```bash
-pnpm --filter @repo/backend setup   # Initialize Convex project (run once)
-pnpm --filter @repo/backend dev     # Start Convex development server only
-pnpm --filter @repo/backend deploy  # Deploy Convex backend to production
-```
-
-### Package-Specific
-
-```bash
-pnpm --filter web dev         # Run only the Next.js application
-```
-
-## Project Management
-
-### Adding New Packages
-
-```bash
-turbo gen
-```
-
-Follow the prompts to scaffold a new package with proper TypeScript and build configurations.
-
-### Adding shadcn/ui Components
-
-```bash
-cd apps/web
-pnpm dlx shadcn@canary add [component-name]
-```
-
-Components are automatically added to the UI package and can be imported across the monorepo.
-
-### Managing Dependencies
-
-```bash
-# Add to specific package
-pnpm --filter web add [package-name]
-pnpm --filter @repo/ui add [package-name]
-pnpm --filter @repo/backend add [package-name]
-
-# Add to workspace root (affects all packages)
-pnpm add -w [package-name]
-
-# Add dev dependencies
-pnpm --filter web add -D [package-name]
-```
-
-## Deployment
-
-### 1. Deploy Convex Backend
-
-```bash
-pnpm --filter @repo/backend run deploy
-```
-
-This creates your production Convex deployment and provides you with a production URL.
-
-### 2. Configure Production Environment
-
-Update your hosting platform (Vercel, Netlify, etc.) with the production Convex URL:
-
-```env
-CONVEX_URL=https://your-production-deployment.convex.cloud
-NEXT_PUBLIC_CONVEX_URL=https://your-production-deployment.convex.cloud
-```
-
-### 3. Build and Deploy Frontend
-
-```bash
-pnpm build
-```
-
-Then deploy the built application using your preferred hosting platform's deployment method.
+MIT
