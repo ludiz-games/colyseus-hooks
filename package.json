@@ -21,6 +21,7 @@
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "check-types": "tsc --noEmit",
+    "prepare": "pnpm run build",
     "prepublishOnly": "pnpm run build"
   },
   "keywords": [
@@ -44,7 +45,6 @@
     "@colyseus/schema": ">=2.0.0"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
     "@types/react": "^18.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
